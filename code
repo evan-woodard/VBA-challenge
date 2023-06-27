@@ -1,0 +1,111 @@
+Sub masterstocks()
+ Dim ws As Worksheet
+ 
+For Each ws In Worksheets
+    Cells.EntireColumn.AutoFit
+    
+    Dim lastrow As Long
+        lastrow = Range("A" & Rows.Count).End(xlUp).Row
+
+    Dim symbol As String
+
+    Dim voltotal As LongLong
+        voltotal = 0
+
+    Dim volrow As Integer
+        volrow = 2
+        
+    Dim yearopen As Double
+    Dim yearclose As Double
+    Dim yearchange As Double
+    Dim percentchange As Double
+
+    Dim changerow As Long
+        changerow = 2
+    Dim percentrow As Long
+        percentrow = 2
+        
+    Cells(1, 9) = "Ticker"
+    Cells(1, 10) = "Yearly Change"
+    Cells(1, 11) = "Percent Change"
+    Cells(1, 12) = "Total Stock Volume"
+    
+    Cells(2, 14) = "Greatest % Increase"
+    Cells(3, 14) = "Greatest % Decrease"
+    Cells(4, 14) = "Greatest Total Volume"
+    Cells(1, 15) = "Ticker"
+    Cells(1, 16) = "Value"
+    
+  
+  
+  For i = 2 To lastrow
+
+    If Cells(i + 1, 1).Value <> Cells(i, 1).Value Then
+
+      symbol = Cells(i, 1).Value
+      voltotal = voltotal + Cells(i, 7).Value
+      Range("I" & volrow).Value = symbol
+      Range("L" & volrow).Value = voltotal
+      volrow = volrow + 1
+      voltotal = 0
+
+    Else
+      voltotal = voltotal + Cells(i, 7).Value
+    
+    End If
+
+  Next i
+  
+    For i = 2 To lastrow
+    
+            If Cells(i, 2).Value < Cells(i + 1, 2).Value Then
+                yearopen = Cells(i, 3).Value
+            End If
+            yearclose = Cells(i, 6).Value
+            
+            Range("J" & changerow).Value = (yearclose - yearopen)
+                
+                    If Range("J" & changerow).Value < 0 Then
+                        Range("J" & changerow).Interior.ColorIndex = 3
+                    Else
+                        Range("J" & changerow).Interior.ColorIndex = 4
+                    End If
+
+                If (yearclose - yearopen) = 0 Or yearclose = 0 Or yearopen = 0 Or ((yearclose - yearopen) / yearopen) = 0 Then
+                    Range("K" & percentrow).Value = "NA"
+                Else
+                    Range("K" & percentrow).Value = FormatPercent((yearclose - yearopen) \ yearopen)
+                End If
+            
+            changerow = changerow + 1
+            percentrow = percentrow + 1
+        
+    Next i
+        
+    For i = 2 To lastrow
+    
+            If Cells(i, 11) > Cells(i + 1, 11) Then
+                Cells(2, 15).Value = Cells(i, 9).Value
+                Cells(2, 16).Value = Cells(i, 11).Value
+            End If
+            
+            If Cells(i, 11) < Cells(i + 1, 11) Then
+                Cells(2, 15).Value = Cells(i, 9).Value
+                Cells(3, 16).Value = Cells(i, 11).Value
+            End If
+            
+            If Cells(i, 12) < Cells(i + 1, 12) Then
+                Cells(2, 15).Value = Cells(i, 9).Value
+                Cells(4, 16).Value = Cells(i, 12).Value
+            End If
+            
+    Next i
+
+
+  ws.Activate
+  
+Next
+
+End Sub
+
+
